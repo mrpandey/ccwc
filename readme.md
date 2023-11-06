@@ -1,4 +1,4 @@
-A tool similar to linux command `wc`. It tells you the count of bytes, characters, words and lines in a text file (or stdin).
+A tool similar to linux command `wc`. It tells you the count of bytes, characters, words and newlines in a text file (or stdin).
 
 
 This is a solution of [this coding challenge](https://codingchallenges.fyi/challenges/challenge-wc/) by John Crickett.
