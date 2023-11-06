@@ -1,0 +1,9 @@
+Here is a sample file for testing this tool.
+It contains the usual 1-byte characters as well as multi-byte unicode characters like 汉字.
+It contains consecutive newlines.
+
+
+It contains whitespace between    and at the end of lines.      
+And, of course, it contains punctuations like commas, semicolons(;), and fullstop.
+
+And there is no newline at the end of this sentence.
