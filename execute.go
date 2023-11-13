@@ -25,6 +25,7 @@ func Execute(parser Parser) {
 			count, err := stdinCounter(opts)
 			if err != nil {
 				fmt.Printf("%v: %v\n", txtIn.Name, err)
+				continue
 			}
 
 			totalCount.Add(count)
@@ -34,7 +35,9 @@ func Execute(parser Parser) {
 			count, err := fileCounter(txtIn.Name, opts)
 			if err != nil {
 				fmt.Printf("%v: %v\n", txtIn.Name, err)
+				continue
 			}
+
 			totalCount.Add(count)
 			PrintOutput(count, opts, txtIn)
 		}

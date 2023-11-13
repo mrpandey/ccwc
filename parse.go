@@ -59,7 +59,7 @@ var DefaultParser = func(args []string) (Options, []TextInput, error) {
 				case "l":
 					opts.PrintLineCount = true
 				default:
-					return opts, inputs, fmt.Errorf("%v: %v", ErrInvalidOption, char)
+					return opts, inputs, fmt.Errorf("%w: %v", ErrInvalidOption, char)
 				}
 			}
 		} else {

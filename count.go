@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"unicode"
@@ -25,7 +24,7 @@ func (c *Count) Add(other Count) {
 func FileCounter(filename string, opts Options) (Count, error) {
 	file, err := os.Open(filename)
 	if err != nil {
-		return Count{}, fmt.Errorf("%v: %v", filename, ErrCannotReadFile)
+		return Count{}, ErrCannotOpenFile
 	}
 
 	defer file.Close()
@@ -33,7 +32,7 @@ func FileCounter(filename string, opts Options) (Count, error) {
 	if opts.PrintByteCount && !opts.PrintCharCount && !opts.PrintWordCount && !opts.PrintLineCount {
 		finfo, err := file.Stat()
 		if err != nil {
-			return Count{}, fmt.Errorf("%v: %v", filename, ErrCannotGetFileInfo)
+			return Count{}, ErrCannotGetFileInfo
 		}
 		return Count{Bytes: int(finfo.Size())}, nil
 	}
