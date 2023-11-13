@@ -6,9 +6,8 @@ import (
 )
 
 // these can be reassigned to a mock of the corresponding function during testing
-var wholeFileReader = WholeFileReader
-var stdinReader = StdinReader
-var allCounter = AllCounter
+var stdinCounter = StdinCounter
+var fileCounter = FileCounter
 
 func Execute(parser Parser) {
 	args := os.Args[1:]
@@ -23,35 +22,19 @@ func Execute(parser Parser) {
 
 	for _, txtIn := range textInputs {
 		if txtIn.Type == StdIn {
-			text, err := stdinReader()
+			count, err := stdinCounter(opts)
 			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-
-			count, err := allCounter(text, opts)
-			if err != nil {
-				fmt.Println(err)
-				continue
+				fmt.Printf("%v: %v\n", txtIn.Name, err)
 			}
 
 			totalCount.Add(count)
 			PrintOutput(count, opts, txtIn)
 
 		} else if txtIn.Type == File {
-			// TODO: use different strategy for large files
-			text, err := wholeFileReader(txtIn.Name)
+			count, err := fileCounter(txtIn.Name, opts)
 			if err != nil {
-				fmt.Println(err)
-				continue
+				fmt.Printf("%v: %v\n", txtIn.Name, err)
 			}
-
-			count, err := allCounter(text, opts)
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-
 			totalCount.Add(count)
 			PrintOutput(count, opts, txtIn)
 		}

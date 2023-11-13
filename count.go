@@ -1,11 +1,12 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
 	"unicode"
 )
-
-// Return number of bytes, characters, lines and words in the text.
-type Counter func(text string, opts Options) (Count, error)
 
 type Count struct {
 	Bytes    int
@@ -14,44 +15,99 @@ type Count struct {
 	Newlines int
 }
 
-// Counts the number of bytes, chars, words and newlines in a text and returns it.
-var AllCounter = func(text string, _ Options) (Count, error) {
-	numBytes := len(text)
-	if numBytes == 0 {
-		return Count{0, 0, 0, 0}, nil
+func (c *Count) Add(other Count) {
+	c.Bytes += other.Bytes
+	c.Chars += other.Chars
+	c.Words += other.Words
+	c.Newlines += other.Newlines
+}
+
+func FileCounter(filename string, opts Options) (Count, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return Count{}, fmt.Errorf("%v: %v", filename, ErrCannotReadFile)
 	}
 
-	numChars := 0
-	numWords := 0
-	numNewlines := 0
+	defer file.Close()
+
+	if opts.PrintByteCount && !opts.PrintCharCount && !opts.PrintWordCount && !opts.PrintLineCount {
+		finfo, err := file.Stat()
+		if err != nil {
+			return Count{}, fmt.Errorf("%v: %v", filename, ErrCannotGetFileInfo)
+		}
+		return Count{Bytes: int(finfo.Size())}, nil
+	}
+
+	return FullCounter(file)
+}
+
+func StdinCounter(opts Options) (Count, error) {
+	if opts.PrintByteCount && !opts.PrintCharCount && !opts.PrintWordCount && !opts.PrintLineCount {
+		return ByteCounter(os.Stdin)
+	}
+
+	return FullCounter(os.Stdin)
+}
+
+func FullCounter(r io.Reader) (Count, error) {
+	reader := bufio.NewReader(r)
+
+	count := Count{}
 	isPartOfWord := false
 
-	for _, rn := range text {
-		numChars++
-
-		if string(rn) == "\n" {
-			numNewlines++
+	for {
+		r, size, err := reader.ReadRune()
+		// TODO: test case where a rune is split into multiple reads
+		if err == io.EOF {
+			break
 		}
 
-		if unicode.IsSpace(rn) {
+		if err != nil {
+			return count, ErrCannotReadContent
+		}
+
+		if r == unicode.ReplacementChar && size == 1 {
+			return count, ErrInvalidUTF8
+		}
+
+		count.Bytes += size
+		count.Chars++
+
+		if string(r) == "\n" {
+			count.Newlines++
+		}
+
+		if unicode.IsSpace(r) {
 			isPartOfWord = false
 		} else if !isPartOfWord {
 			isPartOfWord = true
-			numWords++
+			count.Words++
 		}
 	}
 
-	return Count{
-		Bytes:    numBytes,
-		Chars:    numChars,
-		Words:    numWords,
-		Newlines: numNewlines,
-	}, nil
+	return count, nil
 }
 
-func (c *Count) Add(cc Count) {
-	c.Bytes += cc.Bytes
-	c.Chars += cc.Chars
-	c.Words += cc.Words
-	c.Newlines += cc.Newlines
+func ByteCounter(r io.Reader) (Count, error) {
+	reader := bufio.NewReader(r)
+	// read 16kb at a time
+	buf := make([]byte, 16*1024)
+	count := Count{}
+
+	for {
+		n, err := reader.Read(buf)
+
+		if err == io.EOF {
+			count.Bytes += n
+			break
+		}
+
+		if err != nil {
+			return count, ErrCannotReadContent
+		}
+
+		count.Bytes += n
+	}
+
+	return count, nil
 }

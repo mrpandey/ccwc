@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -58,10 +59,9 @@ var DefaultParser = func(args []string) (Options, []TextInput, error) {
 				case "l":
 					opts.PrintLineCount = true
 				default:
-					return opts, inputs, NewInvalidOptionErr(char)
+					return opts, inputs, fmt.Errorf("%v: %v", ErrInvalidOption, char)
 				}
 			}
-
 		} else {
 			// arg is a filename
 			inputs = append(inputs, TextInput{
@@ -80,13 +80,13 @@ var DefaultParser = func(args []string) (Options, []TextInput, error) {
 	}
 
 	if !(opts.PrintByteCount || opts.PrintCharCount || opts.PrintWordCount || opts.PrintLineCount) {
-		opts.SetDefaultCountConfig()
+		opts.SetDefault()
 	}
 
 	return opts, inputs, nil
 }
 
-func (opts *Options) SetDefaultCountConfig() {
+func (opts *Options) SetDefault() {
 	opts.PrintByteCount = true
 	opts.PrintLineCount = true
 	opts.PrintWordCount = true

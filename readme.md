@@ -9,21 +9,22 @@ Self-imposed restriction: only use standard libraries.
 
 Build: `go build -o ccwc *.go`
 
-Run with a file: `./ccwc -wlcm sample.txt`
+Run with file(s) as input: `./ccwc -wlcm sample_texts/*.txt`
 
 Run with stdin: `./ccwc -wlcm` or `./ccwc -wlcm -`
 
-Run with pipe input: `cat sample.txt | ./ccwc -wlcm`
+Run with piped input: `cat sample.txt | ./ccwc -wlcm`
+
+We can also combine file and stdin: `./ccwc -wlcm sample_texts/test.txt -`
 
 **TODOs**
 
 - [ ] Add tests
 - [ ] Make Readers mockable
-- [ ] Add benchmarks
-- [ ] Add optimization for large files
+- [ ] Add benchmarks (specially against WholeReader)
+- [ ] Do profiling
+- [x] Add optimization for large files; done but not as fast as c version
+- [x] Add optimization for files where only byte count is needed
 - [ ] Add `--help` option.
-
-
-**Known Bugs**
-
-- [ ] stdin gives correct result, but piping a text file gives wrong numbers (except word count)
+- [ ] Concurrent reading of multiple inputs
+- [ ] Calculate count for all first, then print

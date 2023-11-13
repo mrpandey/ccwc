@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
@@ -11,7 +12,7 @@ func WholeFileReader(filename string) (text string, err error) {
 	textBytes, err := os.ReadFile(filename)
 
 	if err != nil {
-		return "", NewReadFileErr(filename)
+		return "", fmt.Errorf("%v: %v", filename, ErrCannotReadFile)
 	}
 
 	return string(textBytes), nil
