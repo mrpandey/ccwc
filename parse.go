@@ -15,10 +15,10 @@ const (
 )
 
 type Options struct {
-	PrintByteCount bool
-	PrintCharCount bool
-	PrintWordCount bool
-	PrintLineCount bool
+	PrintByteCount    bool
+	PrintCharCount    bool
+	PrintWordCount    bool
+	PrintNewlineCount bool
 }
 
 type TextInput struct {
@@ -57,7 +57,7 @@ var DefaultParser = func(args []string) (Options, []TextInput, error) {
 				case "w":
 					opts.PrintWordCount = true
 				case "l":
-					opts.PrintLineCount = true
+					opts.PrintNewlineCount = true
 				default:
 					return opts, inputs, fmt.Errorf("%w: %v", ErrInvalidOption, char)
 				}
@@ -79,7 +79,7 @@ var DefaultParser = func(args []string) (Options, []TextInput, error) {
 		})
 	}
 
-	if !(opts.PrintByteCount || opts.PrintCharCount || opts.PrintWordCount || opts.PrintLineCount) {
+	if !(opts.PrintByteCount || opts.PrintCharCount || opts.PrintWordCount || opts.PrintNewlineCount) {
 		opts.SetDefault()
 	}
 
@@ -88,6 +88,6 @@ var DefaultParser = func(args []string) (Options, []TextInput, error) {
 
 func (opts *Options) SetDefault() {
 	opts.PrintByteCount = true
-	opts.PrintLineCount = true
+	opts.PrintNewlineCount = true
 	opts.PrintWordCount = true
 }

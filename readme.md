@@ -25,6 +25,9 @@ We can also combine file and stdin: `./ccwc -wlcm sample_texts/test.txt -`
 - [ ] Do profiling
 - [x] Add optimization for large files; done but not as fast as c version
 - [x] Add optimization for files where only byte count is needed
-- [ ] Add `--help` option.
-- [ ] Concurrent reading of multiple inputs
-- [ ] Calculate count for all first, then print
+- [ ] Add `--help` option
+- [x] Concurrent reading of multiple inputs
+- [ ] Limit the number of goroutines?
+- [ ] Achieve wc level of number_width accuracy
+- [ ] What about piped input and manual stdin together? e.g. `cat test.txt | ./ccwc -wlcm -`
+- [ ] Is counting words, lines, etc. concurrently faster than calculating them all in one function call?

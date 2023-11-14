@@ -29,7 +29,7 @@ func FileCounter(filename string, opts Options) (Count, error) {
 
 	defer file.Close()
 
-	if opts.PrintByteCount && !opts.PrintCharCount && !opts.PrintWordCount && !opts.PrintLineCount {
+	if opts.PrintByteCount && !opts.PrintCharCount && !opts.PrintWordCount && !opts.PrintNewlineCount {
 		finfo, err := file.Stat()
 		if err != nil {
 			return Count{}, ErrCannotGetFileInfo
@@ -41,7 +41,7 @@ func FileCounter(filename string, opts Options) (Count, error) {
 }
 
 func StdinCounter(opts Options) (Count, error) {
-	if opts.PrintByteCount && !opts.PrintCharCount && !opts.PrintWordCount && !opts.PrintLineCount {
+	if opts.PrintByteCount && !opts.PrintCharCount && !opts.PrintWordCount && !opts.PrintNewlineCount {
 		return ByteCounter(os.Stdin)
 	}
 
