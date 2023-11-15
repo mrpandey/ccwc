@@ -35,4 +35,4 @@ A couple test files are available in sample_texts directory. Larger text files c
 
 **Known Bugs**
 
-- [ ] `./ccwc -wlcm - -` is only reading once from input. Process stdin sequentially, not concurrently.
+- [ ] `cat sample_texts/test.txt | ./ccwc -wlcm - -` does not read from stdin second time. This behaviour is same as `wc`. Should I fix?

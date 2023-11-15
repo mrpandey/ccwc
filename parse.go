@@ -22,8 +22,9 @@ type Options struct {
 }
 
 type TextInput struct {
-	Type InputType
-	Name string
+	Type  InputType
+	Name  string
+	Index int
 }
 
 var DefaultParser = func(args []string) (Options, []TextInput, error) {
@@ -77,6 +78,10 @@ var DefaultParser = func(args []string) (Options, []TextInput, error) {
 			Type: StdIn,
 			Name: "",
 		})
+	}
+
+	for i := range inputs {
+		inputs[i].Index = i
 	}
 
 	if !(opts.PrintByteCount || opts.PrintCharCount || opts.PrintWordCount || opts.PrintNewlineCount) {

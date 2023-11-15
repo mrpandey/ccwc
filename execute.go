@@ -28,14 +28,25 @@ func Execute(parser Parser) {
 
 	totalCount := Count{}
 
-	channels := make([]chan *InputCount, lenInput)
 	wg := sync.WaitGroup{}
+	channels := make([]chan *InputCount, lenInput)
 
-	for i, txtIn := range textInputs {
-		channels[i] = make(chan *InputCount)
-		wg.Add(1)
-		go ProcessInput(txtIn, opts, channels[i], &wg)
+	stdInputs := []TextInput{}
+
+	for _, txtIn := range textInputs {
+		channels[txtIn.Index] = make(chan *InputCount)
+
+		if txtIn.Type == StdIn {
+			stdInputs = append(stdInputs, txtIn)
+		} else {
+			wg.Add(1)
+			go ProcessFileInput(txtIn, opts, channels[txtIn.Index], &wg)
+		}
 	}
+
+	// process all stdin sequentially in a separate go routine
+	wg.Add(1)
+	go ProcessStdInput(stdInputs, opts, channels, &wg)
 
 	// print result in the same order of textInputs in a separate go routine
 	wg.Add(1)
@@ -63,17 +74,10 @@ func Execute(parser Parser) {
 	}
 }
 
-func ProcessInput(input TextInput, opts Options, ch chan *InputCount, wg *sync.WaitGroup) {
+func ProcessFileInput(input TextInput, opts Options, ch chan *InputCount, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	var err error
-	var count Count
-
-	if input.Type == StdIn {
-		count, err = stdinCounter(opts)
-	} else {
-		count, err = fileCounter(input.Name, opts)
-	}
+	count, err := fileCounter(input.Name, opts)
 
 	if err != nil {
 		printMu.Lock()
@@ -84,4 +88,23 @@ func ProcessInput(input TextInput, opts Options, ch chan *InputCount, wg *sync.W
 	} else {
 		ch <- &InputCount{Count: count, Input: input}
 	}
+}
+
+func ProcessStdInput(inputs []TextInput, opts Options, chs []chan *InputCount, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for _, input := range inputs {
+		count, err := stdinCounter(opts)
+
+		if err != nil {
+			printMu.Lock()
+			fmt.Printf("stdin: %v", err)
+			printMu.Unlock()
+
+			chs[input.Index] <- nil
+		} else {
+			chs[input.Index] <- &InputCount{Count: count, Input: input}
+		}
+	}
+
 }
