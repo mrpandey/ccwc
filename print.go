@@ -2,7 +2,14 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
+
+// acquire this mutex before printing and using numWidth
+var printMu sync.Mutex
+
+// width of each number printed, must be a multiple of 8
+var numWidth = 8
 
 func GetNumsToPrint(count Count, opts Options) (numsToPrint []int) {
 	if opts.PrintNewlineCount {
@@ -40,7 +47,9 @@ func UpdateNumWidth(c Count, opts Options) {
 	printMu.Lock()
 
 	if maxWidth > numWidth {
-		numWidth += 8
+		// numWidth is next multiple of 8
+		numWidth = maxWidth
+		numWidth += 8 - maxWidth%8
 	}
 
 	printMu.Unlock()

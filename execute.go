@@ -6,12 +6,6 @@ import (
 	"sync"
 )
 
-// acquire this mutex before printing and using numWidth
-var printMu sync.Mutex
-
-// width of each number printed, must be a multiple of 8
-var numWidth = 8
-
 // these can be reassigned to a mock of the corresponding function during testing
 var stdinCounter = StdinCounter
 var fileCounter = FileCounter
